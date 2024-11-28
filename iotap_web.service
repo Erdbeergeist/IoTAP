@@ -1,0 +1,12 @@
+[Unit]
+Description=IoTAP Control Server
+After=network.target
+
+[Service]
+User=USERNAME
+WorkingDirectory=/home/USERNAME/iotap_web
+ExecStart=/home/USERNAME/iotap_web/iotap/bin/python /home/USERNAME/iotap_web/iotap_web.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
