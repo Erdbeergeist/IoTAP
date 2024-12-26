@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AP Control</title>
+    <script>
+        async function toggleAP() {
+            try {
+                const response = await fetch('/toggle', { method: 'POST' });
+                const data = await response.json();
+                document.getElementById('status').textContent = data.ap_active ? "Active" : "Inactive";
+            } catch (error) {
+                console.error("Error toggling AP:", error);
+            }
+        }
+	    async function fetchRemainingTime() {
+		    const response = await fetch('/remaining_time');
+		    const data = await response.json();
+		    document.getElementById('remaining_time').innerText = `Remaining time: ${data.remaining_time} seconds`;
+	    }
+
+	    function startPolling() {
+		    fetchRemainingTime();
+		    setInterval(fetchRemainingTime, 1000);
+	    }
+    </script>
+</head>
+<body onload="startPolling()">
+    <h1>Wi-Fi Access Point Control</h1>
+    <p>Access Point Status: <span id="status">{{ "Active" if status else "Inactive" }}</span></p>
+    <button onclick="toggleAP()">Toggle Access Point</button>
+    <p id='remaining_time'></p>
+</body>
+</html>
+
