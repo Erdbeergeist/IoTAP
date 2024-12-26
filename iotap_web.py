@@ -1,11 +1,20 @@
 from flask import Flask, jsonify, render_template
+import threading
 import subprocess
 import logging
 
 app = Flask(__name__)
+shutdown_timer = None
+timeout = 1200
 
 AP_NAME = "iotap"
 logging.basicConfig(filename='ap_control.log', level=logging.DEBUG)
+
+def disable_wifi():
+    """Disable wifi"""
+    shutdown_timer = None
+    subprocess.run(["sudo", "nmcli", "connection", "down", AP_NAME])
+
 
 def get_ap_status():
     """Check if the access point is active."""
@@ -22,6 +31,10 @@ def get_ap_status():
 def toggle_ap():
     """Toggle the access point state."""
     if get_ap_status():
+        if shutdown_timer:
+            shutdown_timer.cancel()
+        shutdown_timer = threading.Timer(timeout, disable_wifi)
+        shutdown_timer.start()
         subprocess.run(["sudo", "nmcli", "connection", "down", AP_NAME])
         return False
     else:
